@@ -1,0 +1,7 @@
+frontend:
+  image: unpredictableprashant/learnerreportcs_frontend:latest
+  replicas: 3
+
+backend:
+  image: unpredictableprashant/learnerreportcs_backend:latest
+  replicas: 3
