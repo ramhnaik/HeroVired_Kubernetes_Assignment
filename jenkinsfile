@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        FRONTEND_REPO = 'https://github.com/UnpredictablePrashant/learnerReportCS_frontend.git'
+        BACKEND_REPO = 'https://github.com/UnpredictablePrashant/learnerReportCS_backend.git'
+        HELM_CHART = 'mychart'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                dir('frontend') {
+                    git url: "${FRONTEND_REPO}", branch: 'main'
+                }
+                dir('backend') {
+                    git url: "${BACKEND_REPO}", branch: 'main'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    sh 'docker build -t unpredictableprashant/learnerreportcs_frontend:latest .'
+                }
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                dir('backend') {
+                    sh 'docker build -t unpredictableprashant/learnerreportcs_backend:latest .'
+                }
+            }
+        }
+
+        stage('Push Images') {
+            steps {
+                sh 'docker push unpredictableprashant/learnerreportcs_frontend:latest'
+                sh 'docker push unpredictableprashant/learnerreportcs_backend:latest'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'helm upgrade --install myrelease ${HELM_CHART}'
+            }
+        }
+    }
+}
